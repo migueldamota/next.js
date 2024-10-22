@@ -359,6 +359,18 @@ async fn graph_node_to_referenced_nodes(
         .iter()
         .map(|reference| async {
             let reference = *reference;
+            // println!(
+            //     "reference {:?} has {:?}",
+            //     reference.to_string().await?,
+            //     reference
+            //         .resolve_reference()
+            //         .primary_modules()
+            //         .await?
+            //         .iter()
+            //         .map(|m| m.ident().to_string())
+            //         .try_join()
+            //         .await?
+            // );
             let Some(chunkable_module_reference) =
                 Vc::try_resolve_downcast::<Box<dyn ChunkableModuleReference>>(reference).await?
             else {

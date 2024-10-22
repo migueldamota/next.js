@@ -1488,6 +1488,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                         return Ok(());
                     }
                 }
+                // println!(
+                //     "Require CjsRequireAssetReference {:?} {:?}",
+                //     origin.origin_path().to_string().await?,
+                //     pat
+                // );
                 analysis.add_reference(CjsRequireAssetReference::new(
                     origin,
                     Request::parse(Value::new(pat)),
@@ -1537,6 +1542,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                         return Ok(());
                     }
                 }
+                // println!(
+                //     "RequireResolve CjsRequireResolveAssetReference {:?} {:?}",
+                //     origin.origin_path().to_string().await?,
+                //     pat
+                // );
                 analysis.add_reference(CjsRequireResolveAssetReference::new(
                     origin,
                     Request::parse(Value::new(pat)),
@@ -1605,6 +1615,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                         return Ok(());
                     }
                 }
+                // println!(
+                //     "FsReadMethod FileSourceReference {:?} {:?}",
+                //     source.ident().to_string().await?,
+                //     pat
+                // );
                 analysis.add_reference(FileSourceReference::new(source, Pattern::new(pat)));
                 return Ok(());
             }
@@ -1648,6 +1663,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                     return Ok(());
                 }
             }
+            // println!(
+            //     "FsReadMethod PathResolve {:?} {:?}",
+            //     source.ident().to_string().await?,
+            //     pat
+            // );
             analysis.add_reference(FileSourceReference::new(source, Pattern::new(pat)));
             return Ok(());
         }
@@ -1655,7 +1675,9 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
         JsValue::WellKnownFunction(WellKnownFunctionKind::PathJoin) => {
             let context_path = source.ident().path().await?;
             // ignore path.join in `node-gyp`, it will includes too many files
-            if context_path.path.contains("node_modules/node-gyp") {
+            if context_path.path.contains("node_modules/node-gyp")
+                || context_path.path.contains("node_modules/node-pre-gyp")
+            {
                 return Ok(());
             }
             let args = linked_args(args).await?;
@@ -1682,6 +1704,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                     return Ok(());
                 }
             }
+            // println!(
+            //     "FsReadMethod PathJoin {:?} {:?}",
+            //     source.ident().to_string().await?,
+            //     pat
+            // );
             analysis.add_reference(DirAssetReference::new(source, Pattern::new(pat)));
             return Ok(());
         }
@@ -1721,6 +1748,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                     show_dynamic_warning = true;
                 }
                 if !dynamic || !ignore_dynamic_requests {
+                    // println!(
+                    //     "FsReadMethod ChildProcessSpawnMethod {:?} {:?}",
+                    //     source.ident().to_string().await?,
+                    //     pat
+                    // );
                     analysis.add_reference(FileSourceReference::new(source, Pattern::new(pat)));
                 }
                 if show_dynamic_warning {
@@ -1762,6 +1794,11 @@ async fn handle_call<G: Fn(Vec<Effect>) + Send + Sync>(
                         return Ok(());
                     }
                 }
+                // println!(
+                //     "FsReadMethod ChildProcessFork {:?} {:?}",
+                //     source.ident().to_string().await?,
+                //     pat
+                // );
                 analysis.add_reference(CjsAssetReference::new(
                     origin,
                     Request::parse(Value::new(pat)),
